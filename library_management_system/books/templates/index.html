@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Welcome to EB</h2>
+<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta minima rem quod veniam nisi eos sit corrupti, molestiae fugiat saepe ipsum ducimus nesciunt neque similique totam cumque maiores, consequatur ipsa?</p>
+
+<p>We currently have {{ total_books }} books in our Library.</p>
+
+<!-- Search Form -->
+<form method="get" action="{% url 'index' %}">
+    <input type="text" name="q" placeholder="Search books..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+<h3>Available Books</h3>
+<ul>
+    {% for book in books %}
+        <li>
+            <strong>{{ book.title }}</strong> by {{ book.author }} - 
+            <a href="{% url 'borrow_book' book_id=book.book_id %}">Borrow This Book</a>
+        </li>
+    {% empty %}
+        <li>No available books at the moment.</li>
+    {% endfor %}
+</ul>
+
+<!-- Link to User's Borrowed Books and Status -->
+<li><a href="{% url 'borrowed_books' %}">Your Borrowed Books</a></li>
+
+<!-- Displaying Books Due Soon and Overdue Status -->
+{% if due_soon_books %}
+    <h3>Books Due Soon</h3>
+    <ul>
+        {% for book in due_soon_books %}
+            <li style="background-color: #fff3cd; color: #856404;">
+                <strong>{{ book.book.title }}</strong> - Due on {{ book.due_date }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if overdue_books %}
+    <h3>Overdue Books</h3>
+    <ul>
+        {% for book in overdue_books %}
+            <li style="background-color: #f8d7da; color: #721c24;">
+                <strong>{{ book.book.title }}</strong> - Was due on {{ book.due_date }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% endblock %}

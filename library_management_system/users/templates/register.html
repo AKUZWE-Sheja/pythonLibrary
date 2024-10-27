@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mt-4">Create an Account</h2>
+    <form action="" method="post" class="mt-4">
+        {% csrf_token %}
+        {{ form.non_field_errors }}  <!-- Display non-field errors if any -->
+
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            <input type="text" name="username" class="form-control" placeholder="Enter your username" value="{{ form.username.value }}" required>
+            {{ form.username.errors }}  <!-- Display errors related to username -->
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            <input type="email" name="email" class="form-control" placeholder="Enter your email" value="{{ form.email.value }}" required>
+            {{ form.email.errors }}  <!-- Display errors related to email -->
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">Password</label>
+            <input type="password" name="password1" class="form-control" placeholder="Enter your password" required>
+            {{ form.password1.errors }}  <!-- Display errors related to password -->
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+            <input type="password" name="password2" class="form-control" placeholder="Confirm your password" required>
+            {{ form.password2.errors }}  <!-- Display errors related to password confirmation -->
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Sign Up</button>
+    </form>
+
+    <div class="border-top pt-3">
+        <small class="text-muted">Already have an account? <a href="{% url 'login' %}">Login here</a></small>
+    </div>
+</div>
+{% endblock %}

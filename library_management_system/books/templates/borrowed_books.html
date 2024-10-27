@@ -1,0 +1,29 @@
+<!-- templates/view_borrowed_books.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Your Borrowed Books</h1>
+
+{% if borrowed_books %}
+    <ul>
+        {% for borrowed in borrowed_books %}
+            <li>
+                <strong>{{ borrowed.book.title }}</strong> borrowed on {{ borrowed.date_borrowed }} 
+                {% if borrowed.return_date %}
+                    - Returned on {{ borrowed.return_date }}
+                {% else %}
+                    - Due on {{ borrowed.due_date }}
+                    <form method="POST" action="{% url 'return_book' borrowed.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Return Book</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no borrowed books.</p>
+{% endif %}
+
+<a href="{% url 'index' %}">Back to Home</a>
+{% endblock %}
