@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 {% block content %}
 <h2>Edit Book</h2>
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    <!-- {{ form.as_p }} -->
+    {{ form|crispy }}
     <button type="submit">Save Changes</button>
 </form>
 <a href="{% url 'index' %}">Cancel</a>

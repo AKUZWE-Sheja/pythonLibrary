@@ -1,54 +1,122 @@
 from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse_lazy, reverse
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
+from datetime import timedelta
 from books.forms import BookForm, BorrowBookForm
 from books.models import BooksModel, BorrowedBook
-from django.contrib.auth.models import User,auth
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.utils import timezone
-from datetime import timedelta
 
-def index(request):
-    books = BooksModel.objects.filter(status='available')
-    total = BooksModel.objects.count()
-    return render(request, 'index.html', {'books': books, 'total_books': total})
+# About Page - Static Page, using TemplateView
+class AboutView(TemplateView):
+    template_name = 'about.html'
+    extra_context = {'title': "About Page"}  # Provides extra context for template
 
-def superuser_required(function):
-    return user_passes_test(lambda u: u.is_superuser)(function)
 
-def add_book(request):
-    if request.method == "POST":
-        form = BookForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("index")
-    else:
-        form = BookForm()
-    return render(request, "add_book.html", {"form": form})
+# Book List View - Shows available books
+class BookListView(LoginRequiredMixin, ListView):
+    model = BooksModel
+    template_name = 'index.html'
+    context_object_name = 'books'
 
-@login_required
-def borrow_book(request, book_id):
-    book = get_object_or_404(BooksModel, pk=book_id)
+    def get_queryset(self):
+        return BooksModel.objects.filter(status='available')
 
-    if book.status != 'available':
-        return render(request, 'borrow_book.html', {
-            'form': None,
-            'book': book,
-            'error': 'This book is currently not available for borrowing.'
-        })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_books'] = BooksModel.objects.count()  # Total book count for template
+        return context
 
-    if request.method == 'POST':
-        borrowed_book = BorrowedBook(user=request.user, book=book)
-        borrowed_book.save()
 
+# Custom mixin for superuser restriction
+class SuperuserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_superuser  # Allows only superuser access
+
+
+# Book Create View - Allows superusers to add a new book
+class BookCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):
+    model = BooksModel
+    form_class = BookForm
+    template_name = "add_book.html"
+    success_url = reverse_lazy("index")  # Redirect after successful form submission
+
+
+# Book Edit View - Allows superusers to edit book details
+class BookEditView(LoginRequiredMixin, SuperuserRequiredMixin, UpdateView):
+    model = BooksModel
+    form_class = BookForm
+    template_name = "edit.html"
+    success_url = reverse_lazy("index")
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(BooksModel, pk=self.kwargs['pk'])
+
+
+# Book Delete View - Allows superusers to delete a book
+class BookDeleteView(LoginRequiredMixin, SuperuserRequiredMixin, DeleteView):
+    model = BooksModel
+    template_name = 'delete.html'
+    success_url = reverse_lazy("index")
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(BooksModel, pk=self.kwargs['pk'])
+
+
+# Borrow Book View - Allows users to borrow an available book
+class BookBorrowView(LoginRequiredMixin, CreateView):
+    model = BorrowedBook
+    form_class = BorrowBookForm
+    template_name = 'borrow_book.html'
+
+    def form_valid(self, form):
+        # Access the book using the primary key from the URL
+        book = get_object_or_404(BooksModel, pk=self.kwargs['pk'])
+
+        # Check if the book is available
+        if book.status != 'available':
+            return self.render_to_response(self.get_context_data(form=form, book=book, error='This book is currently not available for borrowing.'))
+
+        # Update book status to rented and save
         book.status = 'rented'
         book.save()
 
-        return redirect('borrowed_books')
-    else:
-        form = BorrowBookForm()
+        # Set the user and book instance in the form
+        form.instance.user = self.request.user
+        form.instance.book = book
+        return super().form_valid(form)
 
-    return render(request, 'borrow_book.html', {'form': form, 'book': book})
+    def get_success_url(self):
+        return reverse('borrowed-books')
 
 
+# Return Book View - Allows users to return a borrowed book
+# class BookReturnView(LoginRequiredMixin, UpdateView):
+#     model = BorrowedBook
+#     fields = []  # No form fields needed as we only update return date
+#     template_name = 'return_book.html'
+#     success_url = reverse_lazy('borrowed-books')
+
+#     def form_valid(self, form):
+#         borrowed_book = self.get_object()
+
+#         # Check if the book has already been returned
+#         if borrowed_book.return_date is not None:
+#             return self.render_to_response(self.get_context_data(form=form, borrowed_book=borrowed_book, error='This book has already been returned.'))
+
+#         # Update the book status to available
+#         borrowed_book.book.status = 'available'
+#         borrowed_book.book.save()
+        
+#         # Update the return date
+#         borrowed_book.return_date = timezone.now()  # Update return date
+#         borrowed_book.save()  # Save the updated borrowed book instance
+
+#         return super().form_valid(form)
+
+#     def get_object(self, queryset=None):
+#         return get_object_or_404(BorrowedBook, pk=self.kwargs['pk'])
 @login_required
 def return_book(request, borrowed_id):
     borrowed_book = get_object_or_404(BorrowedBook, id=borrowed_id)
@@ -60,50 +128,35 @@ def return_book(request, borrowed_id):
         borrowed_book.return_date = timezone.now() 
         borrowed_book.save()  
 
-        return redirect('borrowed_books')
+        return redirect('borrowed-books')
 
     return render(request, 'return_book.html', {'borrowed_book': borrowed_book})
 
 
-@login_required
-def borrowed_books(request):
-    borrowed_books = BorrowedBook.objects.filter(user=request.user)
-    overdue_books = []
-    due_soon_books = []
 
-    # Determine if books are overdue or due soon
-    for borrowed in borrowed_books:
-        if borrowed.due_date < timezone.now():
-            overdue_books.append(borrowed)
-        elif borrowed.due_date < timezone.now() + timedelta(days=3):
-            due_soon_books.append(borrowed)
+# Borrowed Books View - Shows a list of borrowed books and status
+class BorrowedBooksView(LoginRequiredMixin, ListView):
+    model = BorrowedBook
+    template_name = 'borrowed_books.html'
+    context_object_name = 'borrowed_books'
 
-    context = {
-        'borrowed_books': borrowed_books,
-        'overdue_books': overdue_books,
-        'due_soon_books': due_soon_books,
-    }
-    return render(request, 'borrowed_books.html', context)
+    def get_queryset(self):
+        return BorrowedBook.objects.filter(user=self.request.user)
 
-@superuser_required
-@login_required
-def edit_book(request, book_id):
-    book = get_object_or_404(BooksModel, pk=book_id)
-    if request.method == "POST":
-        form = BookForm(request.POST, instance=book)
-        if form.is_valid():
-            form.save()
-            return redirect("index")
-    else:
-        form = BookForm(instance=book)
-    return render(request, "edit.html", {"form": form, "book": book})
-
-@superuser_required
-@login_required
-def delete_book(request, book_id):
-    book = get_object_or_404(BooksModel, pk=book_id)
-    if request.method == 'POST':
-        book.delete()
-        return redirect('index')
-    return render(request, 'delete.html', {'book': book})
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        borrowed_books = context['borrowed_books']
+        
+        overdue_books = []
+        due_soon_books = []
+        
+        # Check due dates and categorize books
+        for borrowed in borrowed_books:
+            if borrowed.due_date < timezone.now():
+                overdue_books.append(borrowed)
+            elif borrowed.due_date < timezone.now() + timedelta(days=3):
+                due_soon_books.append(borrowed)
+        
+        context['overdue_books'] = overdue_books
+        context['due_soon_books'] = due_soon_books
+        return context

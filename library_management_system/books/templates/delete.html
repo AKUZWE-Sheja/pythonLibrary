@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 {% block content %}
 <h2>Confirm Delete</h2>
 <p>Are you sure you want to delete "{{ book.title }}"?</p>
 <form method="post">
     {% csrf_token %}
+    {{ form|crispy }}
     <button type="submit">Yes, Delete</button>
     <a href="{% url 'index' %}">Cancel</a>
 </form>

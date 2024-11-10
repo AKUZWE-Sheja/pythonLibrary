@@ -13,7 +13,7 @@
                     - Returned on {{ borrowed.return_date }}
                 {% else %}
                     - Due on {{ borrowed.due_date }}
-                    <form method="POST" action="{% url 'return_book' borrowed.id %}">
+                    <form method="POST" action="{% url 'book-return' borrowed.id %}">
                         {% csrf_token %}
                         <button type="submit">Return Book</button>
                     </form>

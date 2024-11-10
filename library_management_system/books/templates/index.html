@@ -1,38 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Welcome to EB</h2>
-<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta minima rem quod veniam nisi eos sit corrupti, molestiae fugiat saepe ipsum ducimus nesciunt neque similique totam cumque maiores, consequatur ipsa?</p>
+<h2>Welcome to EB Library</h2>
+<p>At EB Library, we cherish the beauty of reading and the stories that unite us. Our collection features a diverse range of books, each waiting to transport you to another world or provide insight into new ideas.</p>
 
-<p>We currently have {{ total_books }} books in our Library.</p>
+<p>Currently, we proudly host <strong>{{ total_books }}</strong> books, from timeless classics to modern masterpieces, across various genres.</p>
 
-<!-- Search Form -->
-<form method="get" action="{% url 'index' %}">
-    <input type="text" name="q" placeholder="Search books..." value="{{ query }}">
-    <button type="submit">Search</button>
-</form>
+<h3>Explore Our Genres</h3>
+<p>Whether you're a seasoned reader or just starting, we have something for everyone:</p>
+<ul>
+    <li><strong>Fiction:</strong> Experience captivating narratives that delve into the human experience.</li>
+    <li><strong>Non-Fiction:</strong> Gain knowledge and inspiration from true stories and insightful essays.</li>
+    <li><strong>Children's Literature:</strong> Ignite young imaginations with enchanting tales and fun adventures.</li>
+    <li><strong>Science Fiction:</strong> Journey through galaxies and explore futuristic concepts.</li>
+</ul>
 
 <h3>Available Books</h3>
 <ul>
     {% for book in books %}
         <li>
             <strong>{{ book.title }}</strong> by {{ book.author }} - 
-            <a href="{% url 'borrow_book' book_id=book.book_id %}">Borrow This Book</a>
+            <a href="{% url 'book-borrow' pk=book.pk %}">Borrow This Book</a>
         </li>
+        
     {% empty %}
-        <li>No available books at the moment.</li>
+        <li>No available books at the moment. Check back soon!</li>
     {% endfor %}
 </ul>
 
 <!-- Link to User's Borrowed Books and Status -->
-<li><a href="{% url 'borrowed_books' %}">Your Borrowed Books</a></li>
+<li><a href="{% url 'borrowed-books' %}">View Your Borrowed Books</a></li>
 
 <!-- Displaying Books Due Soon and Overdue Status -->
 {% if due_soon_books %}
     <h3>Books Due Soon</h3>
     <ul>
         {% for book in due_soon_books %}
-            <li style="background-color: #fff3cd; color: #856404;">
+            <li class="due-soon">
                 <strong>{{ book.book.title }}</strong> - Due on {{ book.due_date }}
             </li>
         {% endfor %}
@@ -43,11 +47,10 @@
     <h3>Overdue Books</h3>
     <ul>
         {% for book in overdue_books %}
-            <li style="background-color: #f8d7da; color: #721c24;">
+            <li class="overdue">
                 <strong>{{ book.book.title }}</strong> - Was due on {{ book.due_date }}
             </li>
         {% endfor %}
     </ul>
 {% endif %}
-
 {% endblock %}
