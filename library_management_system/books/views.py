@@ -90,33 +90,6 @@ class BookBorrowView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('borrowed-books')
 
-
-# Return Book View - Allows users to return a borrowed book
-# class BookReturnView(LoginRequiredMixin, UpdateView):
-#     model = BorrowedBook
-#     fields = []  # No form fields needed as we only update return date
-#     template_name = 'return_book.html'
-#     success_url = reverse_lazy('borrowed-books')
-
-#     def form_valid(self, form):
-#         borrowed_book = self.get_object()
-
-#         # Check if the book has already been returned
-#         if borrowed_book.return_date is not None:
-#             return self.render_to_response(self.get_context_data(form=form, borrowed_book=borrowed_book, error='This book has already been returned.'))
-
-#         # Update the book status to available
-#         borrowed_book.book.status = 'available'
-#         borrowed_book.book.save()
-        
-#         # Update the return date
-#         borrowed_book.return_date = timezone.now()  # Update return date
-#         borrowed_book.save()  # Save the updated borrowed book instance
-
-#         return super().form_valid(form)
-
-#     def get_object(self, queryset=None):
-#         return get_object_or_404(BorrowedBook, pk=self.kwargs['pk'])
 @login_required
 def return_book(request, borrowed_id):
     borrowed_book = get_object_or_404(BorrowedBook, id=borrowed_id)
