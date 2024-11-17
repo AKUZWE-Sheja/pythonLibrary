@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.table .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.container h2 {
+    font-weight: bold;
+}

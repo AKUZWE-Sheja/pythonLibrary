@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Books Availability Analytics</h2>
+    <p>Visualizing the number of available and borrowed books in the library.</p>
+
+    <!-- Pie chart for Books Availability -->
+    <h3>Books Availability</h3>
+    <canvas id="availabilityChart" width="400" height="200"></canvas>
+
+    <!-- Table for Book Availability -->
+    <h3 class="mt-5">Books Availability Status</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Book Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.get_status_display }}</td>  <!-- This will display the readable status -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Data passed from the view
+    const labels = {{ labels|safe }};
+    const data = {{ data|safe }};
+
+    // Create a Pie chart for Book Availability
+    const ctx = document.getElementById('availabilityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Book Availability',
+                data: data,
+                backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+</script>
+{% endblock %}

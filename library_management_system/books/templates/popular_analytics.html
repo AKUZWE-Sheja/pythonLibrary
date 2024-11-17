@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Popular Analytics</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h3>Most Borrowed Books</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Times Borrowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in most_borrowed_books %}
+                    <tr>
+                        <td>{{ book.book__title }}</td>
+                        <td>{{ book.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h4>Most Borrowed Books (Chart)</h4>
+            <canvas id="borrowedBooksChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Most Active Users</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Books Borrowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in most_active_users %}
+                    <tr>
+                        <td>{{ user.user__username }}</td>
+                        <td>{{ user.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h4>Most Active Users (Pie Chart)</h4>
+            <canvas id="activeUsersChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Most Borrowed Books (Bar Chart)
+    const borrowedBooksLabels = {{ borrowed_books_labels|safe }};
+    const borrowedBooksData = {{ borrowed_books_data|safe }};
+    
+    const borrowedBooksCtx = document.getElementById('borrowedBooksChart').getContext('2d');
+    new Chart(borrowedBooksCtx, {
+        type: 'bar',
+        data: {
+            labels: borrowedBooksLabels,
+            datasets: [{
+                label: 'Times Borrowed',
+                data: borrowedBooksData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Most Active Users (Pie Chart)
+    const activeUsersLabels = {{ active_users_labels|safe }};
+    const activeUsersData = {{ active_users_data|safe }};
+
+    const activeUsersCtx = document.getElementById('activeUsersChart').getContext('2d');
+    new Chart(activeUsersCtx, {
+        type: 'pie',
+        data: {
+            labels: activeUsersLabels,
+            datasets: [{
+                label: 'Books Borrowed',
+                data: activeUsersData,
+                backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+</script>
+{% endblock content %}

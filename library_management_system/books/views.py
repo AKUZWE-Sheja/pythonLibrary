@@ -11,6 +11,8 @@ from books.models import BooksModel, BorrowedBook
 from datetime import datetime
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
+import json
+
 
 # About Page - Static Page, using TemplateView
 class AboutView(TemplateView):
@@ -139,7 +141,7 @@ class BorrowedBooksView(LoginRequiredMixin, ListView):
         return context
 
 @login_required
-def analytics_view(request):    
+def borrowing_analytics_view(request):    
     # Group rented books by the month of `date_borrowed`
     books_per_month = BorrowedBook.objects.annotate(
         month=TruncMonth('date_borrowed')
@@ -161,7 +163,55 @@ def analytics_view(request):
     print("Months:", months)
     print("Rented Books:", rented_books)
 
-    return render(request, 'analytics.html', {
+    return render(request, 'borrowing_analytics.html', {
         'months': months,
         'rented_books': rented_books,
+    })
+
+def popular_analytics_view(request):
+    # Most Borrowed Books
+    most_borrowed_books = BorrowedBook.objects.values('book__title').annotate(
+        total=Count('id')
+    ).order_by('-total')[:10]  # Top 10 most borrowed books
+
+    # Most Active Users (Top 10)
+    most_active_users = BorrowedBook.objects.values('user__username').annotate(
+        total=Count('id')
+    ).order_by('-total')[:10]  # Top 10 most active users
+
+    # Prepare data for the charts
+    borrowed_books_labels = [book['book__title'] for book in most_borrowed_books]
+    borrowed_books_data = [book['total'] for book in most_borrowed_books]
+
+    active_users_labels = [user['user__username'] for user in most_active_users]
+    active_users_data = [user['total'] for user in most_active_users]
+
+    return render(request, 'popular_analytics.html', {
+        'most_borrowed_books': most_borrowed_books,
+        'most_active_users': most_active_users,
+        'borrowed_books_labels': json.dumps(borrowed_books_labels),
+        'borrowed_books_data': json.dumps(borrowed_books_data),
+        'active_users_labels': json.dumps(active_users_labels),
+        'active_users_data': json.dumps(active_users_data),
+    })
+
+
+def available_analytics_view(request):
+    # Count the number of borrowed books
+    borrowed_books_count = BorrowedBook.objects.count()
+
+    # Count the number of available books
+    available_books_count = BooksModel.objects.filter(status='available').count()
+
+    # Get the list of all books and their availability status
+    books = BooksModel.objects.all()
+
+    # Prepare the data for the chart
+    labels = ['Available Books', 'Borrowed Books']
+    data = [available_books_count, borrowed_books_count]
+
+    return render(request, 'available_analytics.html', {
+        'labels': labels,
+        'data': data,
+        'books': books,  # Pass the books to the template
     })

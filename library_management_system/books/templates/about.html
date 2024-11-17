@@ -2,6 +2,8 @@
 {% block content %}
     <div class="container" style="background: white; padding: 20px; margin-top: 10px; border-radius: 20px;">
         <h1>EB About</h1>
-        <li class="nav-item"><a class="nav-link" href="{% url 'analytics' %}">Analytics</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'borrowing_analytics' %}">Borrowing Analytics</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'popular_analytics' %}">Popular Analytics</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'available_analytics' %}">Availability Analytics</a></li>
     </div>
 {% endblock content %}

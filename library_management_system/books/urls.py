@@ -12,5 +12,7 @@ urlpatterns = [
     # path('borrowed/<int:pk>/return/', BookReturnView.as_view(), name='book-return'),
     path('book/<int:borrowed_id>/return/', views.return_book, name='book-return'),
     path('books/borrowed/', BorrowedBooksView.as_view(), name="borrowed-books"),
-    path('analytics/', views.analytics_view, name='analytics'),
+    path('analytics1/', views.borrowing_analytics_view, name='borrowing_analytics'),
+    path('popular-analytics/', views.popular_analytics_view, name='popular_analytics'),
+    path('available-analytics/', views.available_analytics_view, name='available_analytics'),
 ]
