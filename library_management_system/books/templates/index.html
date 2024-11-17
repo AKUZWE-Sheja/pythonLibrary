@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container my-4">
-    <h2 class="text-center text-primary mb-4">Welcome to EB Library</h2>
+    <h2 class="text-center" style="color: #343a40;"> <i class="fas fa-book-reader" style="margin-right: 12px;"></i> Welcome to EB Library Manager</h2>
     <p class="lead text-center">
         At EB Library, we cherish the beauty of reading and the stories that unite us. Our collection features a diverse range of books, 
         each waiting to transport you to another world or provide insight into new ideas.
@@ -17,15 +17,21 @@
             <ul class="list-group">
                 <li class="list-group-item"><strong>Fiction:</strong> Experience captivating narratives that delve into the human experience.</li>
                 <li class="list-group-item"><strong>Non-Fiction:</strong> Gain knowledge and inspiration from true stories and insightful essays.</li>
+                <li class="list-group-item"><strong>Romance:</strong> Dive into love stories that tug at your heartstrings.</li>
+                <li class="list-group-item"><strong>Classic:</strong> Timeless stories that have shaped literature through the ages.</li>
+                <li class="list-group-item"><strong>Dystopian Fiction:</strong> Explore dark, imagined futures that challenge society's values.</li>
             </ul>
         </div>
         <div class="col-md-6">
             <ul class="list-group">
-                <li class="list-group-item"><strong>Children's Literature:</strong> Ignite young imaginations with enchanting tales and fun adventures.</li>
+                <li class="list-group-item"><strong>Historical Fiction:</strong> Immerse yourself in stories from past events and cultures.</li>
+                <li class="list-group-item"><strong>Biography:</strong> Get inspired by the lives of remarkable individuals.</li>
+                <li class="list-group-item"><strong>Mystery:</strong> Where hidden secrets and unexpected twists keep you guessing until the very end.</li>
                 <li class="list-group-item"><strong>Science Fiction:</strong> Journey through galaxies and explore futuristic concepts.</li>
+                <li class="list-group-item"><strong>Fantasy:</strong> Enter magical worlds filled with mythical creatures and epic quests.</li>
             </ul>
         </div>
-    </div>
+    </div>    
 
     <h3 class="mt-5">Available Books</h3>
     <div class="table-responsive">
@@ -45,8 +51,8 @@
                         <td>{{ book.author }}</td>
                         <td>{{ book.category }}</td>
                         <td>
-                            <a href="{% url 'book-borrow' pk=book.pk %}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-book-reader"></i> Borrow
+                            <a href="{% url 'book-borrow' pk=book.pk %}" class="btn btn-primary-dark btn-sm" style="color: white;">
+                                <i class="fas fa-book-reader" style="margin-right: 10px;"></i>Borrow
                             </a>
                         </td>
                     </tr>
@@ -61,7 +67,7 @@
 
     <!-- Link to User's Borrowed Books and Status -->
     <div class="text-center mt-4">
-        <a href="{% url 'borrowed-books' %}" class="btn btn-info">View Your Borrowed Books</a>
+        <a href="{% url 'borrowed-books' %}" class="btn btn-info-dark">View Borrowed Books</a>
     </div>
 
     <!-- Displaying Books Due Soon and Overdue Status -->

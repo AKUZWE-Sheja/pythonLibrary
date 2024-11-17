@@ -7,27 +7,6 @@
     <!-- Pie chart for Books Availability -->
     <h3>Books Availability</h3>
     <canvas id="availabilityChart" width="400" height="200"></canvas>
-
-    <!-- Table for Book Availability -->
-    <h3 class="mt-5">Books Availability Status</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Book Title</th>
-                <th scope="col">Author</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for book in books %}
-            <tr>
-                <td>{{ book.title }}</td>
-                <td>{{ book.author }}</td>
-                <td>{{ book.get_status_display }}</td>  <!-- This will display the readable status -->
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

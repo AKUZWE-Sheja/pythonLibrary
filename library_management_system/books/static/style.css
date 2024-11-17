@@ -1,3 +1,26 @@
+/* Custom dark button style */
+.btn-primary-dark {
+    background-color: #004085; /* Darker blue shade */
+    border-color: #003366;  /* Even darker border */
+}
+
+.btn-primary-dark:hover {
+    background-color: #003366; /* Darker on hover */
+    border-color: #001f33; /* Darker border on hover */
+}
+
+.btn-info-dark {
+    background-color: #0351a6; /* Darker blue shade */
+    color: white;
+    border: 1px solid #034388; /* Darker border */
+}
+
+.btn-info-dark:hover {
+    background-color: #076bd5; /* Even darker blue shade on hover */
+    border-color: #0252a7;  /* Darker border color on hover */
+    color: #ffffff;  /* Keep the text color white */
+}
+
 body {
     font-family: Arial, sans-serif;
 }
@@ -30,4 +53,9 @@ body {
 
 .container h2 {
     font-weight: bold;
+}
+
+.analy ul, ol {
+    list-style-type: none;
+    padding-left: 0; /* Remove any default left padding */
 }

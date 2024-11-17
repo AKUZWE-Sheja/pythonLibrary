@@ -77,37 +77,39 @@ class BookBorrowView(LoginRequiredMixin, CreateView):
     template_name = 'borrow_book.html'
 
     def form_valid(self, form):
-        # Access the book using the primary key from the URL
         book = get_object_or_404(BooksModel, pk=self.kwargs['pk'])
 
-        # Check if the book is available
+        # Check if the book is available for borrowing
         if book.status != 'available':
             return self.render_to_response(self.get_context_data(form=form, book=book, error='This book is currently not available for borrowing.'))
 
-        # Update book status to rented and save
-        book.status = 'rented'
+        # Update the status of the book to 'rent'
+        book.status = 'rent'
         book.save()
 
-        # Set the user and book instance in the form
+        # Set the form instance fields
         form.instance.user = self.request.user
         form.instance.book = book
+
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('borrowed-books')
 
 @login_required
-def return_book(request, borrowed_id):
-    borrowed_book = get_object_or_404(BorrowedBook, id=borrowed_id)
+def return_book(request, book_id):
+    # Get the borrowed book record
+    borrowed_book = get_object_or_404(BorrowedBook, book_id=book_id, return_date__isnull=True)
 
-    if request.method == 'POST':
-        borrowed_book.book.status = 'available'
-        borrowed_book.book.save() 
-        
-        borrowed_book.return_date = timezone.now() 
-        borrowed_book.save()  
+    # Update the return date to mark the book as returned
+    borrowed_book.return_date = timezone.now()
+    borrowed_book.returned = True  # Set the returned flag (if you're using that approach)
+    borrowed_book.save()
 
-        return redirect('borrowed-books')
+    # Update the book status back to 'available'
+    book = borrowed_book.book
+    book.status = 'available'
+    book.save()
 
     return render(request, 'return_book.html', {'borrowed_book': borrowed_book})
 
@@ -197,14 +199,11 @@ def popular_analytics_view(request):
 
 
 def available_analytics_view(request):
-    # Count the number of borrowed books
-    borrowed_books_count = BorrowedBook.objects.count()
+    # Count the number of borrowed books that have not been returned
+    borrowed_books_count = BorrowedBook.objects.filter(return_date__isnull=True).count()
 
-    # Count the number of available books
+    # Count the number of available books (status 'available' and not rented)
     available_books_count = BooksModel.objects.filter(status='available').count()
-
-    # Get the list of all books and their availability status
-    books = BooksModel.objects.all()
 
     # Prepare the data for the chart
     labels = ['Available Books', 'Borrowed Books']
@@ -213,5 +212,6 @@ def available_analytics_view(request):
     return render(request, 'available_analytics.html', {
         'labels': labels,
         'data': data,
-        'books': books,  # Pass the books to the template
     })
+
+
