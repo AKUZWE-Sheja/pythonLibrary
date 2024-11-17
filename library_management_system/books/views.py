@@ -7,6 +7,10 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, T
 from datetime import timedelta
 from books.forms import BookForm, BorrowBookForm
 from books.models import BooksModel, BorrowedBook
+# Imports for analytics
+from datetime import datetime
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
 
 # About Page - Static Page, using TemplateView
 class AboutView(TemplateView):
@@ -133,3 +137,31 @@ class BorrowedBooksView(LoginRequiredMixin, ListView):
         context['overdue_books'] = overdue_books
         context['due_soon_books'] = due_soon_books
         return context
+
+@login_required
+def analytics_view(request):    
+    # Group rented books by the month of `date_borrowed`
+    books_per_month = BorrowedBook.objects.annotate(
+        month=TruncMonth('date_borrowed')
+    ).values('month').annotate(total=Count('id')).order_by('month')
+    
+    # Debugging: Print records to console
+    print("Books per month:", books_per_month)
+
+    # Prepare data for frontend
+    months = []
+    rented_books = []
+    for record in books_per_month:
+        if record['month']:
+            month_name = record['month'].strftime('%B')  # Convert month to readable name
+            months.append(month_name)
+            rented_books.append(record['total'])
+
+    # Debugging: Print data prepared for rendering
+    print("Months:", months)
+    print("Rented Books:", rented_books)
+
+    return render(request, 'analytics.html', {
+        'months': months,
+        'rented_books': rented_books,
+    })
