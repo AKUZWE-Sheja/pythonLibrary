@@ -1,5 +1,5 @@
 # PythonLibrary
-A digital library using Python
+A digital library using Python by AKUZWE SHEJA **Edwige**
 
 ## Overview
 PythonLibrary is a digital library application designed to facilitate the management of books and borrowing processes. It leverages Django's powerful features to provide a user-friendly interface for both users and administrators.
