@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from datetime import timedelta
@@ -166,8 +166,8 @@ def borrowing_analytics_view(request):
     print("Rented Books:", rented_books)
 
     return render(request, 'borrowing_analytics.html', {
-        'months': months,
-        'rented_books': rented_books,
+        'months': json.dumps(months),
+        'rented_books': json.dumps(rented_books),
     })
 
 def popular_analytics_view(request):
@@ -210,8 +210,8 @@ def available_analytics_view(request):
     data = [available_books_count, borrowed_books_count]
 
     return render(request, 'available_analytics.html', {
-        'labels': labels,
-        'data': data,
+        'labels': json.dumps(labels),
+        'data': json.dumps(data),
     })
 
 

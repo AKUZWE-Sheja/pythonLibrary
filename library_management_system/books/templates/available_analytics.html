@@ -12,8 +12,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Data passed from the view
-    const labels = {{ labels|safe }};
-    const data = {{ data|safe }};
+    const labels = JSON.parse('{{labels|escapejs}}')
+    const data = JSON.parse('{{ data|escapejs }}');
 
     // Create a Pie chart for Book Availability
     const ctx = document.getElementById('availabilityChart').getContext('2d');

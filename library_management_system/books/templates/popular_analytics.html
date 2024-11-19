@@ -55,8 +55,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Most Borrowed Books (Bar Chart)
-    const borrowedBooksLabels = {{ borrowed_books_labels|safe }};
-    const borrowedBooksData = {{ borrowed_books_data|safe }};
+    const borrowedBooksLabels = JSON.parse('{{ borrowed_books_labels|escapejs }}');
+    const borrowedBooksData = JSON.parse('{{ borrowed_books_data|escapejs }}');
     
     const borrowedBooksCtx = document.getElementById('borrowedBooksChart').getContext('2d');
     new Chart(borrowedBooksCtx, {
@@ -82,8 +82,8 @@
     });
 
     // Most Active Users (Pie Chart)
-    const activeUsersLabels = {{ active_users_labels|safe }};
-    const activeUsersData = {{ active_users_data|safe }};
+    const activeUsersLabels = JSON.parse('{{ active_users_labels|escapejs }}');
+    const activeUsersData = JSON.parse('{{ active_users_data|escapejs }}');
 
     const activeUsersCtx = document.getElementById('activeUsersChart').getContext('2d');
     new Chart(activeUsersCtx, {

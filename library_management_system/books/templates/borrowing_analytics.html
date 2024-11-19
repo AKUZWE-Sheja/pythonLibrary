@@ -9,8 +9,8 @@
 <script>
     (function() {
         // Data passed from the view
-        const chartMonths = {{ months|safe }};
-        const rentedBooks = {{ rented_books|safe }};
+        const chartMonths = JSON.parse('{{ months|escapejs }}');
+        const rentedBooks = JSON.parse('{{ rented_books|escapejs }}');
 
         // Configure and render the chart
         const ctx = document.getElementById('booksChart').getContext('2d');
