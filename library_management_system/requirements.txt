@@ -3,3 +3,4 @@ django
 whitenoise
 django-crispy-forms
 Pillow
+
