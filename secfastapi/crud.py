@@ -24,7 +24,7 @@ def update_author(db: Session, author_id: int, author_update: AuthorUpdate):
     db_author = db.query(Author).filter(Author.author_id == author_id).first()
     if not db_author:
         return None
-    for key, value in author_update.dict(exclude_unset=True).items():
+    for key, value in author_update.model_dump(exclude_unset=True).items():
         setattr(db_author, key, value)
     db.commit()
     db.refresh(db_author)
@@ -71,7 +71,7 @@ def update_book(db: Session, book_id: int, book_update: BookUpdate):
     db_book = db.query(Book).filter(Book.book_id == book_id).first()
     if not db_book:
         return None
-    for key, value in book_update.dict(exclude_unset=True).items():
+    for key, value in book_update.model_dump(exclude_unset=True).items():
         setattr(db_book, key, value)
     db.commit()
     db.refresh(db_book)

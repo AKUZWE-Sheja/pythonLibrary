@@ -32,7 +32,7 @@ def read_author(author_id: int, db: Session = Depends(get_db)):
 
 @app.put("/authors/{author_id}", response_model=schemas.Author)
 def update_author(author_id: int, updated_data: schemas.AuthorUpdate, db: Session = Depends(get_db)):
-    return crud.update_author(db=db, author_id=author_id, updated_data=updated_data)
+    return crud.update_author(db=db, author_id=author_id, author_update=updated_data)
 
 @app.delete("/authors/{author_id}")
 def delete_author(author_id: int, db: Session = Depends(get_db)):
@@ -66,7 +66,7 @@ def read_book_by_title(title: str, db: Session = Depends(get_db)):
 
 @app.put("/books/{book_id}", response_model=schemas.Book)
 def update_book(book_id: int, updated_data: schemas.BookUpdate, db: Session = Depends(get_db)):
-    return crud.update_book(db=db, book_id=book_id, updated_data=updated_data)
+    return crud.update_book(db=db, book_id=book_id, book_update=updated_data)
 
 @app.delete("/books/{book_id}")
 def delete_book(book_id: int, db: Session = Depends(get_db)):

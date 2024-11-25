@@ -19,7 +19,7 @@ class Book(Base):
     __tablename__ = 'library_books'
     book_id = Column(Integer, primary_key=True, index=True)
     title = Column(String(80), index=True)
-    author_id = Column(Integer, ForeignKey('authors.author_id'), nullable=True)
+    author_id = Column(Integer, ForeignKey('authors.author_id'))
     year = Column(Integer)
     summary = Column(Text)
     category = Column(String(50))
