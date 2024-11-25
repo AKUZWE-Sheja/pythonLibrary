@@ -31,8 +31,23 @@ class BookListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context['total_books'] = BooksModel.objects.count()  # Total book count for template
+
+        # Get most borrowed book for the index page
+        most_borrowed_books = BorrowedBook.objects.values('book__title').annotate(
+            total=Count('id')
+        ).order_by('-total')[:5]
+
+        # Get the top borrowed book (if any)
+        popular_book = most_borrowed_books[0] if most_borrowed_books else None
+
+        # Add the top borrowed book to context
+        context['top_borrowed_book'] = popular_book
+
         return context
+    
+
 
 
 # Custom mixin for superuser restriction
@@ -97,9 +112,9 @@ class BookBorrowView(LoginRequiredMixin, CreateView):
         return reverse('borrowed-books')
 
 @login_required
-def return_book(request, book_id):
+def return_book(request, borrowed_id):
     # Get the borrowed book record
-    borrowed_book = get_object_or_404(BorrowedBook, book_id=book_id, return_date__isnull=True)
+    borrowed_book = get_object_or_404(BorrowedBook, id=borrowed_id, return_date__isnull=True)
 
     # Update the return date to mark the book as returned
     borrowed_book.return_date = timezone.now()
@@ -112,7 +127,6 @@ def return_book(request, book_id):
     book.save()
 
     return render(request, 'return_book.html', {'borrowed_book': borrowed_book})
-
 
 
 # Borrowed Books View - Shows a list of borrowed books and status
@@ -174,13 +188,16 @@ def popular_analytics_view(request):
     # Most Borrowed Books
     most_borrowed_books = BorrowedBook.objects.values('book__title').annotate(
         total=Count('id')
-    ).order_by('-total')[:10]  # Top 10 most borrowed books
+    ).order_by('-total')[:5]  # Top 5 most borrowed books
 
     # Most Active Users (Top 10)
     most_active_users = BorrowedBook.objects.values('user__username').annotate(
         total=Count('id')
-    ).order_by('-total')[:10]  # Top 10 most active users
+    ).order_by('-total')[:5]  # Top 5 most active users
 
+    # Top borrowed book
+    popular_book = most_borrowed_books[0] if most_borrowed_books else None
+ 
     # Prepare data for the charts
     borrowed_books_labels = [book['book__title'] for book in most_borrowed_books]
     borrowed_books_data = [book['total'] for book in most_borrowed_books]
@@ -196,6 +213,7 @@ def popular_analytics_view(request):
         'active_users_labels': json.dumps(active_users_labels),
         'active_users_data': json.dumps(active_users_data),
     })
+
 
 
 def available_analytics_view(request):
